@@ -9,53 +9,59 @@ import numpy as np
 
 UP, DOWN, LEFT, RIGHT = 0, 1, 2, 3
 
-def find_best_move(board):
-    bestmove = -1    
 
-	# TODO:
-	# Build a heuristic agent on your own that is much better than the random agent.
-	# Your own agent don't have to beat the game.
+def find_best_move(board):
+    bestmove = -1
+
+    # Build a heuristic agent on your own that is much better than the random agent.
+    # Your own agent don't have to beat the game.
     print(board)
-    
+
     bestmove = find_best_move_agent(board)
     return bestmove
 
+
 def find_best_move_random_agent():
-    return random.choice([UP,DOWN,LEFT,RIGHT])
+    return random.choice([UP, DOWN, LEFT, RIGHT])
+
 
 def find_best_move_agent(board):
-    next_move = UP
+    current_zeros = np.count_nonzero(board == 0)
+    simulation = [
+        simulate_move(board, UP, current_zeros),
+        simulate_move(board, DOWN, current_zeros),
+        simulate_move(board, LEFT, current_zeros),
+        simulate_move(board, RIGHT, current_zeros)
+    ]
+    simulation = np.array(simulation)
+    print(simulation)
 
-    board_up = board.copy()
-    board_up = execute_move(UP, board_up)
-    print(board_up)
-    up_zeros = np.count_nonzero(board_up==0)
-    current_zeros = up_zeros
-    if (board_equals(board_up, board)):
-        current_zeros = -1
+    zeros = simulation[:, 1]
+    goodness = simulation[:, 2]
+    most_good_move = int(simulation[np.argmax(goodness), 0])
+    most_zeros_move = int(simulation[np.argmax(zeros), 0])
 
-    board_down = board.copy()
-    board_down = execute_move(DOWN, board_down)
-    down_zeros = np.count_nonzero(board_down==0)
-    if (down_zeros >= current_zeros and not board_equals(board_down, board)):
-        next_move = DOWN
-        current_zeros = down_zeros
+    # TODO: include move goodness in move decision which move is best
 
-    board_left = board.copy()
-    board_left = execute_move(LEFT, board_left)
-    left_zeros = np.count_nonzero(board_left==0)
-    if (left_zeros >= current_zeros and not board_equals(board_left, board)):
-        next_move = LEFT
-        current_zeros = left_zeros
-
-    board_right = board.copy()
-    board_right = execute_move(RIGHT, board_right)
-    right_zeros = np.count_nonzero(board_right==0)
-    if (right_zeros >= current_zeros and not board_equals(board_right, board)):
-        next_move = RIGHT
-        current_zeros = right_zeros
+    next_move = most_zeros_move
 
     return next_move
+
+
+def simulate_move(board, move, current_zeros):
+    new_board = board.copy()
+    new_board = execute_move(move, new_board)
+    zeros = np.count_nonzero(new_board == 0)
+    if zeros >= current_zeros and not board_equals(new_board, board):
+        return np.array([move, zeros, calculate_move_goodness(new_board)])
+    return np.array([move, -1, -1])
+
+
+# move goodness is increased if larger numbers have been combined
+def calculate_move_goodness(board):
+    non_zero_board = [x for x in board.flatten() if x != 0]
+    return np.sum(np.log2(non_zero_board) ** 2)
+
 
 def execute_move(move, board):
     """
@@ -73,9 +79,10 @@ def execute_move(move, board):
         return game.merge_right(board)
     else:
         sys.exit("No valid move")
-		
+
+
 def board_equals(board, newboard):
     """
     Check if two boards are equal
     """
-    return  (newboard == board).all()  
+    return (newboard == board).all()
