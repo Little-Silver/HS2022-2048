@@ -73,12 +73,12 @@ def find_alignement(board):
     vertical_alignments = 0
     
     # Check rows
-    for i in range(0, len(board)):
-        horizontal_alignments = check_row(board[i])
+    for i in range(0, len(board_cp)):
+        horizontal_alignments = check_row(board_cp[i])
 
     # Check columns
-    for i in range(0, len(board[i])):
-        vertical_alignments = check_row(board[:,i])
+    for i in range(0, len(board_cp[i])):
+        vertical_alignments = check_row(board_cp[:,i])
 
     return max(horizontal_alignments, vertical_alignments)
 
@@ -92,6 +92,7 @@ def check_row(row):
             previous = -1
         else: 
             previous = row[i]
+    return alignment
 
 def execute_move(move, board):
     """
