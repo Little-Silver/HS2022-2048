@@ -27,13 +27,12 @@ def find_best_move_random_agent():
 
 def find_best_move_agent(board):
     current_zeros = np.count_nonzero(board == 0)
-    simulation = [
+    simulation = np.array([
         simulate_move(board, UP, current_zeros),
         simulate_move(board, DOWN, current_zeros),
         simulate_move(board, LEFT, current_zeros),
         simulate_move(board, RIGHT, current_zeros)
-    ]
-    simulation = np.array(simulation)
+    ])
     print(simulation)
 
     zeros = simulation[:, 1]
@@ -52,6 +51,9 @@ def simulate_move(board, move, current_zeros):
     new_board = board.copy()
     new_board = execute_move(move, new_board)
     zeros = np.count_nonzero(new_board == 0)
+    
+    zeros += find_alignement(board)
+    
     if zeros >= current_zeros and not board_equals(new_board, board):
         return np.array([move, zeros, calculate_move_goodness(new_board)])
     return np.array([move, -1, -1])
@@ -62,6 +64,34 @@ def calculate_move_goodness(board):
     non_zero_board = [x for x in board.flatten() if x != 0]
     return np.sum(np.log2(non_zero_board) ** 2)
 
+def find_alignement(board):
+    board_cp = board.copy()
+    board_cp = board_cp[~np.all(board_cp == 0, axis=0)]
+    board_cp = board_cp[~np.all(board_cp == 0, axis=1)]
+
+    horizontal_alignments = 0
+    vertical_alignments = 0
+    
+    # Check rows
+    for i in range(0, len(board)):
+        horizontal_alignments = check_row(board[i])
+
+    # Check columns
+    for i in range(0, len(board[i])):
+        vertical_alignments = check_row(board[:,i])
+
+    return max(horizontal_alignments, vertical_alignments)
+
+def check_row(row):
+    alignment = 0
+    row = row[row != 0]
+    previous = -1
+    for i in range(0, len(row)):
+        if (previous == row[i]):
+            alignment += 1
+            previous = -1
+        else: 
+            previous = row[i]
 
 def execute_move(move, board):
     """
