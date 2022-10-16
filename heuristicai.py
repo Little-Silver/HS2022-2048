@@ -51,9 +51,9 @@ def simulate_move(board, move, current_zeros):
     new_board = board.copy()
     new_board = execute_move(move, new_board)
     zeros = np.count_nonzero(new_board == 0)
-    
-    zeros += find_alignement(board)
-    
+
+    zeros += find_alignment(board)
+
     if zeros >= current_zeros and not board_equals(new_board, board):
         return np.array([move, zeros, calculate_move_goodness(new_board)])
     return np.array([move, -1, -1])
@@ -64,23 +64,25 @@ def calculate_move_goodness(board):
     non_zero_board = [x for x in board.flatten() if x != 0]
     return np.sum(np.log2(non_zero_board) ** 2)
 
-def find_alignement(board):
+
+def find_alignment(board):
     board_cp = board.copy()
     board_cp = board_cp[~np.all(board_cp == 0, axis=0)]
     board_cp = board_cp[~np.all(board_cp == 0, axis=1)]
 
     horizontal_alignments = 0
     vertical_alignments = 0
-    
+
     # Check rows
     for i in range(0, len(board_cp)):
         horizontal_alignments = check_row(board_cp[i])
 
     # Check columns
     for i in range(0, len(board_cp[i])):
-        vertical_alignments = check_row(board_cp[:,i])
+        vertical_alignments = check_row(board_cp[:, i])
 
     return max(horizontal_alignments, vertical_alignments)
+
 
 def check_row(row):
     alignment = 0
@@ -90,9 +92,10 @@ def check_row(row):
         if (previous == row[i]):
             alignment += 1
             previous = -1
-        else: 
+        else:
             previous = row[i]
     return alignment
+
 
 def execute_move(move, board):
     """
