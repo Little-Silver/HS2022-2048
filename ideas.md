@@ -20,3 +20,16 @@
 Performance measure:
 - Time per move
 - avg score
+
+# Idea always move up or left if possible
+- top row should always be full if possible
+- left as long as possible
+- if left is not possible go up
+- right is allowed if top row is full and nothing will be combined
+- before combining the first row, it would be awesome if the second row was full
+--> if that is possible go left and then go up to fill the first row immediatly again
+
+Goal: [[biggest number, 2nd biggest, some number, some number], 
+        [...,...,...,...],
+        [...,...,...,...],
+        [...,...,...,...],]

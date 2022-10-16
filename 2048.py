@@ -57,7 +57,7 @@ def play_game(gamectrl):
     moveno = 0
     start = time.time()
     while 1:
-        time.sleep(5)
+        time.sleep(.01)
         state = gamectrl.get_status()
         if state == 'ended':
             break

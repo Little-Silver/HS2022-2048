@@ -15,23 +15,42 @@ def find_best_move(board):
 
     # Build a heuristic agent on your own that is much better than the random agent.
     # Your own agent don't have to beat the game.
-    print(board)
 
-    bestmove = find_best_move_agent(board)
+    bestmove = find_best_move_normal_greedy(board)
     return bestmove
-
 
 def find_best_move_random_agent():
     return random.choice([UP, DOWN, LEFT, RIGHT])
 
+def find_best_move_agent_corner(board):
+    
 
-def find_best_move_agent(board):
+    if game.move_exists(UP):
+        return UP
+    if game.move_exists(LEFT):
+        return LEFT
+    if game.move_exists(RIGHT):
+        return RIGHT
+    if game.move_exists(DOWN):
+        return DOWN
+    return random.choice([UP, DOWN, LEFT, RIGHT])
+
+
+def find_best_move_smart_greedy(board):
+    return find_best_move_agent_greedy(board, [3, 1, 2, 1])
+
+def find_best_move_normal_greedy(board):
+    return find_best_move_agent_greedy(board, [0, 0, 0, 0])
+
+# Find the best immediate move (the one that results in the most combined numbers in the next 2 moves)
+def find_best_move_agent_greedy(board, priorities):
     current_zeros = np.count_nonzero(board == 0)
+
     simulation = np.array([
-        simulate_move(board, UP, current_zeros),
-        simulate_move(board, DOWN, current_zeros),
-        simulate_move(board, LEFT, current_zeros),
-        simulate_move(board, RIGHT, current_zeros)
+        simulate_move(board, UP, current_zeros, priorities[0]),
+        simulate_move(board, DOWN, current_zeros, priorities[1]),
+        simulate_move(board, LEFT, current_zeros, priorities[2]),
+        simulate_move(board, RIGHT, current_zeros, priorities[3])
     ])
     print(simulation)
 
@@ -47,17 +66,16 @@ def find_best_move_agent(board):
     return next_move
 
 
-def simulate_move(board, move, current_zeros):
+def simulate_move(board, move, current_zeros, bonus):
     new_board = board.copy()
     new_board = execute_move(move, new_board)
-    zeros = np.count_nonzero(new_board == 0)
+    zeros = np.count_nonzero(new_board == 0) 
     
-    zeros += find_alignement(board)
+    zeros += find_alignement(board) + bonus #* 0.3 
     
     if zeros >= current_zeros and not board_equals(new_board, board):
         return np.array([move, zeros, calculate_move_goodness(new_board)])
     return np.array([move, -1, -1])
-
 
 # move goodness is increased if larger numbers have been combined
 def calculate_move_goodness(board):
@@ -66,21 +84,21 @@ def calculate_move_goodness(board):
 
 def find_alignement(board):
     board_cp = board.copy()
-    board_cp = board_cp[~np.all(board_cp == 0, axis=0)]
-    board_cp = board_cp[~np.all(board_cp == 0, axis=1)]
+    return max(horizontal_alignments(board_cp), vertical_alignments(board_cp))
 
-    horizontal_alignments = 0
-    vertical_alignments = 0
-    
+def horizontal_alignments(board):
     # Check rows
-    for i in range(0, len(board_cp)):
-        horizontal_alignments = check_row(board_cp[i])
+    horizontal_alignments = 0
+    for i in range(0, len(board)):
+        horizontal_alignments = check_row(board[i])
+    return horizontal_alignments
 
+def vertical_alignments(board):
     # Check columns
-    for i in range(0, len(board_cp[i])):
-        vertical_alignments = check_row(board_cp[:,i])
-
-    return max(horizontal_alignments, vertical_alignments)
+    vertical_alignments = 0
+    for i in range(0, len(board[0])):
+        vertical_alignments = check_row(board[:,i])
+    return vertical_alignments
 
 def check_row(row):
     alignment = 0
@@ -88,7 +106,8 @@ def check_row(row):
     previous = -1
     for i in range(0, len(row)):
         if (previous == row[i]):
-            alignment += 1
+            # Playing around with weights
+            alignment += 0.5 #+ np.log2(previous) / 4
             previous = -1
         else: 
             previous = row[i]
