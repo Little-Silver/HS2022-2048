@@ -28,6 +28,7 @@ Performance measure:
 - right is allowed if top row is full and nothing will be combined
 - before combining the first row, it would be awesome if the second row was full
 --> if that is possible go left and then go up to fill the first row immediatly again
+- in some edge cases certain rules may be ignored
 
 Goal: [[biggest number, 2nd biggest, some number, some number], 
         [...,...,...,...],
