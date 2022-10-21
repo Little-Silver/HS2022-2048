@@ -34,3 +34,16 @@ Goal: [[biggest number, 2nd biggest, some number, some number],
         [...,...,...,...],
         [...,...,...,...],
         [...,...,...,...],]
+
+
+1. Find best move (UP, LEFT, RIGHT)
+        1.1 LEFT and UP always allowed
+        1.2 RIGHT if LEFT and UP are not possible
+        1.3 RIGHT allowed if first row is full
+3. Repeat 1. and 2. until impossible
+4. RIGHT if possible
+        4.1 UP if good combinations in first row possible 4.2 back to 1.
+5. DOWN
+        5.1 UP
+        5.2 back to 1.
+

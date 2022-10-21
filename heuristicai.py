@@ -65,6 +65,23 @@ def find_best_move_agent_greedy(board, priorities):
 
     return next_move
 
+def get_moves(board, i):
+    move_up = get_moves(game.merge_up(np.copy(board)), i+1)
+    move_left = get_moves(game.merge_left(np.copy(board)), i+1)
+    move_right = get_moves(game.merge_right(np.copy(board)), i+1)
+    move_down = get_moves(game.merge_down(np.copy(board)), i+1)
+    return np.concatenate(move_up, move_left, move_right, move_down)
+
+def find_optimal_move_with_lookahead(board, steps):
+    
+    move_list = np.empty([steps, 4**steps])
+
+    for i in range(steps):
+        move_up = game.merge_up(np.copy(board))
+        move_left = game.merge_left(np.copy(board))
+        move_right = game.merge_right(np.copy(board))
+        move_down = game.merge_down(np.copy(board))
+    
 
 def simulate_move(board, move, current_zeros, bonus):
     new_board = board.copy()
@@ -129,6 +146,19 @@ def execute_move(move, board):
         return game.merge_right(board)
     else:
         sys.exit("No valid move")
+
+def first_row_full(board):
+    return board[0][board[0] != 0] == 0
+
+#def is_move_possible(board, move):
+#    match move:
+#        case UP:
+#            for i in range(len(board)):
+#                for j in range(board[i]):
+#                    
+#        case DOWN:
+#        case LEFT:
+#        case RIGHT:
 
 
 def board_equals(board, newboard):
