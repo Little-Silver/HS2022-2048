@@ -47,3 +47,7 @@ Goal: [[biggest number, 2nd biggest, some number, some number],
         5.1 UP
         5.2 back to 1.
 
+## searchai
+- smoothness (calculate difference between adjacent tiles)
+- use expectimax
+- use expectimax (only with 3 directions)
