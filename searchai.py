@@ -10,6 +10,8 @@ from itertools import product
 # Copyright:   Algorithm from https://github.com/nneonneo/2048-ai
 # Description: The logic to beat the game. Based on expectimax algorithm.
 BOARD_SIZE = 16
+BOARD_WIDTH = 4
+BOARD_HEIGHT = 4
 
 UP, DOWN, LEFT, RIGHT = 0, 1, 2, 3
 
@@ -17,29 +19,22 @@ def count_zeros(board):
     return 16 - np.count_nonzero(board)
 # Returns a list of (board, probability) pairs
 
-def find_spawn_possibilities(board):
-    zero_elements = count_zeros(board)
-    prob_2 = 0.9 / zero_elements
-    prob_4 = 0.1 / zero_elements
-    possible_boards = np.empty([zero_elements*2,4, 4])
-    probabilities = np.empty([zero_elements*2])
-    i = -1
-    for x in range(len(board)):
-        for y in range(len(board[0])):
+def score_spawn_possibilities(board, depth, prob):
+    prob_2 = 0.9
+    prob_4 = 0.1
+    score = 1
+    for x in range(BOARD_WIDTH):
+        for y in range(BOARD_HEIGHT):
             if board[x][y] == 0:
-                i += 1
                 board_with_2 = np.copy(board)
                 board_with_2[x][y] = 2
-                possible_boards[i] = board_with_2
-                probabilities[i] = prob_2
-                i += 1
+                score += simulate_move(board_with_2, depth, prob*prob_2)
                 board_with_4 = np.copy(board)
                 board_with_4[x][y] = 4
-                possible_boards[i] = board_with_4
-                probabilities[i] = prob_4
-    return possible_boards, probabilities
+                score += simulate_move(board_with_4, depth, prob*prob_4)
+    return score
 
-def find_best_move(board, moveno):
+def find_best_move(board):
     """
     find the best move for the next turn.
     """
@@ -65,11 +60,11 @@ def score_toplevel_move(args):
     zeros = count_zeros(board)
     
     depth = 1
-    if(zeros < 11):
+    if(zeros < 9):
         depth = 2
-    if (zeros < 5):
+    if (zeros < 3):
         depth = 3
-    elif (zeros < 2):
+    elif (zeros < 1):
         depth = 4
 
     return step(board, move, depth, 1)
@@ -96,10 +91,7 @@ def step(board, move, depth, prob):
     score = 0
     new_board = execute_move(move, board)
     if not board_equals(board, new_board):
-        score = 1
-        board_possibilities, probabilities = find_spawn_possibilities(new_board)
-        for b, p in zip(board_possibilities, probabilities):
-            score += simulate_move(b, depth, prob*p)
+        score += score_spawn_possibilities(new_board, depth, prob)
     return score
 
 def score_board(board):
