@@ -60,7 +60,7 @@ def score_toplevel_move(args):
     zeros = count_zeros(board)
     
     depth = 1
-    if(zeros < 9):
+    if(zeros < 8):
         depth = 2
     if (zeros < 3):
         depth = 3
@@ -76,23 +76,22 @@ def simulate_move(board, depth, probability=1):
     
     depth -= 1
     
-    score_up = step(board, UP, depth, probability)
-    score_left = step(board, LEFT, depth, probability)
+    score_up = step(board, game.merge_up(board), depth, probability)
+    score_left = step(board, game.merge_left(board), depth, probability)
     score_down = 0
     #score_right = 0
     #if(score_left == 0 and score_up == 0):
-    score_right = step(board, RIGHT, depth, probability)
+    score_right = step(board, game.merge_right(board), depth, probability)
     #if(score_right == 0):
-    score_down = step(board, DOWN, depth, probability)
+    score_down = step(board, game.merge_down(board), depth, probability)
 
     return max(score_up, score_down, score_left, score_right)
 
-def step(board, move, depth, prob):
-    score = 0
-    new_board = execute_move(move, board)
-    if not board_equals(board, new_board):
-        score += score_spawn_possibilities(new_board, depth, prob)
-    return score
+def step(board, new_board, depth, prob):
+    if board_equals(board, new_board):
+        return 0
+    else:
+        return score_spawn_possibilities(new_board, depth, prob)
 
 def score_board(board):
     first_row = 1
