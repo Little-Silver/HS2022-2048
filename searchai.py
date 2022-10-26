@@ -13,10 +13,17 @@ BOARD_SIZE = 16
 BOARD_WIDTH = 4
 BOARD_HEIGHT = 4
 
+SCORE_TOP_LEFT = np.array([[2**15, 2**14, 2**13, 2**12], [2**8, 2**9, 2**10, 2**11], [2**7, 2**6, 2**5, 2**4], [0, 2**1, 2**2, 2**3]]) ** 2
+# SCORE_TOP_RIGHT = np.array([[2**12, 2**13, 2**14, 2**15], [2**11, 2**10, 2**9, 2**8], [2**4, 2**5, 2**6, 2**7], [2**3, 2**2, 2**1, 0]]) ** 2
+# SCORE_BOTTOM_LEFT = np.array([[0, 2**1, 2**2, 2**3], [2**7, 2**6, 2**5, 2**4], [2**8, 2**9, 2**10, 2**11], [2**15, 2**14, 2**13, 2**12]]) ** 2
+# SCORE_BOTTOM_RIGHT = np.array([[2**3, 2**2, 2**1, 0], [2**4, 2**5, 2**6, 2**7], [2**11, 2**10, 2**9, 2**8], [2**12, 2**13, 2**14, 2**15]]) ** 2
+
+# SCORE_BOARD_ARR = np.array([SCORE_TOP_LEFT, SCORE_TOP_RIGHT, SCORE_BOTTOM_LEFT, SCORE_BOTTOM_RIGHT])
+
 UP, DOWN, LEFT, RIGHT = 0, 1, 2, 3
 
 def count_zeros(board):
-    return 16 - np.count_nonzero(board)
+    return (16 - np.count_nonzero(board)) ** 2
 # Returns a list of (board, probability) pairs
 
 def score_spawn_possibilities(board, depth, prob):
@@ -40,32 +47,25 @@ def find_best_move(board):
     """
 
     bestmove = -1
-    move_args = [UP, DOWN, LEFT, RIGHT]
-    param = [(move_args[0], board), (move_args[1], board), (move_args[2], board), (move_args[3], board)]
-
-    pool = multiprocessing.Pool(multiprocessing.cpu_count())
-    result = pool.map(score_toplevel_move, param)
+    UP, DOWN, LEFT, RIGHT = 0, 1, 2, 3
+    move_args = [UP,DOWN,LEFT,RIGHT]
     
+    result = [score_toplevel_move(i, board) for i in range(len(move_args))]
     bestmove = result.index(max(result))
 
     for m in move_args:
         print("move: %d score: %.4f" % (m, result[m]))
-
     return bestmove
 
-def score_toplevel_move(args):
-    move = args[0]
-    board = args[1]
+def score_toplevel_move(move, board):
 
     zeros = count_zeros(board)
     
     depth = 1
-    if(zeros < 8):
+    if(zeros < 5):
         depth = 2
-    if (zeros < 3):
+    if (zeros < 2):
         depth = 3
-    elif (zeros < 1):
-        depth = 4
 
     return step(board, move, depth, 1)
 
@@ -76,32 +76,32 @@ def simulate_move(board, depth, probability=1):
     
     depth -= 1
     
-    score_up = step(board, game.merge_up(board), depth, probability)
-    score_left = step(board, game.merge_left(board), depth, probability)
+    score_up = step(board, UP, depth, probability)
+    score_left = step(board, LEFT, depth, probability)
     score_down = 0
     #score_right = 0
     #if(score_left == 0 and score_up == 0):
-    score_right = step(board, game.merge_right(board), depth, probability)
+    score_right = step(board, RIGHT, depth, probability)
     #if(score_right == 0):
-    score_down = step(board, game.merge_down(board), depth, probability)
+    score_down = step(board, DOWN, depth, probability)
 
     return max(score_up, score_down, score_left, score_right)
 
-def step(board, new_board, depth, prob):
+def step(board, move, depth, prob):
+    new_board = execute_move(move, board)
     if board_equals(board, new_board):
         return 0
     else:
         return score_spawn_possibilities(new_board, depth, prob)
 
 def score_board(board):
-    first_row = 1
-    #if(np.count_nonzero(board[0] == 4)):
-        #first_row = 5
-        #first_row *= board[0][0]/board[0][1]
-        #first_row *= board[0][1]/board[0][2]
-        #first_row *= board[0][2]/board[0][3]
-        #first_row *= np.log2(np.sum(board[0]))
-    return count_zeros(board)*smoothness(board) #* (board[0][0]+1) * first_row
+    board = board.astype(int)
+
+    zeros = count_zeros(board)
+    smooth = smoothness(board)
+    weight = weighted_board_score(board)
+
+    return weight#int(zeros) * weight*smooth
 
 def smoothness(board):
     log_board = np.copy(board)
@@ -110,6 +110,14 @@ def smoothness(board):
         val += np.sum(abs(log_board[i] - log_board[i+1]))
         val += np.sum(abs(log_board[:,i] - log_board[:,i+1]))
     return (1/(val))
+
+def weighted_board_score(board):
+    s = 0
+    for row in range(BOARD_WIDTH):
+        for col in range(BOARD_HEIGHT):
+            s += board[row, col] * SCORE_TOP_LEFT[row, col]
+
+    return s
 
 def execute_move(move, board):
     """

@@ -105,3 +105,7 @@ Multithreading
 Depth
 
 - The depth of the tree can be adjusted depending on the number of zeros left on the board. The more zeros left the more time it takes (exponentially) to dive deeper. Therefore the depth can be increased if there are less zeros left on the board.
+
+Simple starting strategy
+
+- At the start of the game it is very simple to get good results. Therefore one potential optimization is to use a very simple algorithm for the first X moves.
