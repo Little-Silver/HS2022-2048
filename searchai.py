@@ -14,16 +14,16 @@ BOARD_WIDTH = 4
 BOARD_HEIGHT = 4
 
 SCORE_TOP_LEFT = np.array([[2**15, 2**14, 2**13, 2**12], [2**8, 2**9, 2**10, 2**11], [2**7, 2**6, 2**5, 2**4], [0, 2**1, 2**2, 2**3]]) ** 2
-# SCORE_TOP_RIGHT = np.array([[2**12, 2**13, 2**14, 2**15], [2**11, 2**10, 2**9, 2**8], [2**4, 2**5, 2**6, 2**7], [2**3, 2**2, 2**1, 0]]) ** 2
-# SCORE_BOTTOM_LEFT = np.array([[0, 2**1, 2**2, 2**3], [2**7, 2**6, 2**5, 2**4], [2**8, 2**9, 2**10, 2**11], [2**15, 2**14, 2**13, 2**12]]) ** 2
-# SCORE_BOTTOM_RIGHT = np.array([[2**3, 2**2, 2**1, 0], [2**4, 2**5, 2**6, 2**7], [2**11, 2**10, 2**9, 2**8], [2**12, 2**13, 2**14, 2**15]]) ** 2
+SCORE_TOP_RIGHT = np.array([[2**12, 2**13, 2**14, 2**15], [2**11, 2**10, 2**9, 2**8], [2**4, 2**5, 2**6, 2**7], [2**3, 2**2, 2**1, 0]]) ** 2
+SCORE_BOTTOM_LEFT = np.array([[0, 2**1, 2**2, 2**3], [2**7, 2**6, 2**5, 2**4], [2**8, 2**9, 2**10, 2**11], [2**15, 2**14, 2**13, 2**12]]) ** 2
+SCORE_BOTTOM_RIGHT = np.array([[2**3, 2**2, 2**1, 0], [2**4, 2**5, 2**6, 2**7], [2**11, 2**10, 2**9, 2**8], [2**12, 2**13, 2**14, 2**15]]) ** 2
 
-# SCORE_BOARD_ARR = np.array([SCORE_TOP_LEFT, SCORE_TOP_RIGHT, SCORE_BOTTOM_LEFT, SCORE_BOTTOM_RIGHT])
+SCORE_BOARD_ARR = np.array([SCORE_TOP_LEFT, SCORE_TOP_RIGHT, SCORE_BOTTOM_LEFT, SCORE_BOTTOM_RIGHT])
 
 UP, DOWN, LEFT, RIGHT = 0, 1, 2, 3
 
 def count_zeros(board):
-    return (16 - np.count_nonzero(board)) ** 2
+    return (16 - np.count_nonzero(board))
 # Returns a list of (board, probability) pairs
 
 def score_spawn_possibilities(board, depth, prob):
@@ -62,14 +62,14 @@ def score_toplevel_move(move, board):
     zeros = count_zeros(board)
     
     depth = 1
-    if(zeros < 5):
+    if(zeros < 4):
         depth = 2
     if (zeros < 2):
         depth = 3
 
     return step(board, move, depth, 1)
 
-def simulate_move(board, depth, probability=1):
+def simulate_move(board, depth, probability):
 
     if depth == 0:
         return probability * score_board(board)
@@ -93,6 +93,9 @@ def step(board, move, depth, prob):
         return 0
     else:
         return score_spawn_possibilities(new_board, depth, prob)
+def prioritize_edges(board):
+    score_board = np.array([[2, 1, 1, 2],[1, 0, 0, 1], [1, 0, 0, 1], [2, 1, 1, 2]])
+    return np.sum(np.power(score_board, board))
 
 def score_board(board):
     board = board.astype(int)
@@ -100,23 +103,23 @@ def score_board(board):
     zeros = count_zeros(board)
     smooth = smoothness(board)
     weight = weighted_board_score(board)
-
-    return weight#int(zeros) * weight*smooth
+    g = prioritize_edges(board)
+    return zeros*100 #+ weight*1#+g*0.01 #* zeros**2# int(int(zeros)* (g)) # (smooth*0.01)#(weight/100)
 
 def smoothness(board):
     log_board = np.copy(board)
-    val = 0
+    ver = 0
+    hor = 0
     for i in range(3):
-        val += np.sum(abs(log_board[i] - log_board[i+1]))
-        val += np.sum(abs(log_board[:,i] - log_board[:,i+1]))
-    return (1/(val))
+        ver += np.sum(abs(log_board[i] - log_board[i+1]))
+        hor += np.sum(abs(log_board[:,i] - log_board[:,i+1]))
+    return (1/(min(ver, hor)**2))
 
 def weighted_board_score(board):
-    s = 0
-    for row in range(BOARD_WIDTH):
-        for col in range(BOARD_HEIGHT):
-            s += board[row, col] * SCORE_TOP_LEFT[row, col]
-
+    s_max = 0
+    for SCORE_BOARD in SCORE_BOARD_ARR:
+        s = 0
+        s_max = (np.sum(np.multiply(board, SCORE_BOARD)), s_max)
     return s
 
 def execute_move(move, board):
