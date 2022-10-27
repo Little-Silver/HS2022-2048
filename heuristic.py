@@ -10,12 +10,12 @@ SCORE_BOTTOM_RIGHT = np.array([[2**3, 2**2, 2**1, 0], [2**4, 2**5, 2**6, 2**7], 
 SCORE_BOARD_ARR = np.array([SCORE_TOP_LEFT, SCORE_TOP_RIGHT, SCORE_BOTTOM_LEFT, SCORE_BOTTOM_RIGHT])
 
 def smoothness(board):
-    log_board = np.copy(board)
+    #log_board = np.copy(board)
     ver = 1
     hor = 1
     for i in range(3):
-        ver += np.sum(abs(log_board[i] - log_board[i+1]))
-        hor += np.sum(abs(log_board[:,i] - log_board[:,i+1]))
+        ver += np.sum(abs(board[i] - board[i+1]))
+        hor += np.sum(abs(board[:,i] - board[:,i+1]))
     return (1/(min(ver, hor)**2))
 
 def weighted_board_score(board):
@@ -26,6 +26,9 @@ def weighted_board_score(board):
 
 def count_zeros(board):
     return (16 - np.count_nonzero(board))
+
+def zero_penalty(board):
+    return
 
 def prioritize_edges(board):
     score_board = np.array([[2, 1, 1, 2],[1, 0, 0, 1], [1, 0, 0, 1], [2, 1, 1, 2]])
