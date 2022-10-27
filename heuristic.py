@@ -11,8 +11,8 @@ SCORE_BOARD_ARR = np.array([SCORE_TOP_LEFT, SCORE_TOP_RIGHT, SCORE_BOTTOM_LEFT, 
 
 def smoothness(board):
     log_board = np.copy(board)
-    ver = 0
-    hor = 0
+    ver = 1
+    hor = 1
     for i in range(3):
         ver += np.sum(abs(log_board[i] - log_board[i+1]))
         hor += np.sum(abs(log_board[:,i] - log_board[:,i+1]))
@@ -21,9 +21,8 @@ def smoothness(board):
 def weighted_board_score(board):
     s_max = 0
     for SCORE_BOARD in SCORE_BOARD_ARR:
-        s = 0
-        s_max = (np.sum(np.multiply(board, SCORE_BOARD)), s_max)
-    return s
+        s_max = max(np.sum(np.multiply(board, SCORE_BOARD)), s_max)
+    return s_max
 
 def count_zeros(board):
     return (16 - np.count_nonzero(board))

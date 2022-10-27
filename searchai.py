@@ -77,12 +77,18 @@ def simulate_move(board, depth, probability):
     return max(score_up, score_down, score_left, score_right)
 
 # ********************************* SCORING *********************************
-def score_board(board):
-    board = board.astype(int)
+FACTOR_EMPTY_TILES = 1
+FACTOR_SMOOTHNESS = 1
+FACTOR_EDGES = 1
+FACTOR_BOARD_WEIGHT = 1
 
-    zeros = ha.count_zeros(board)
-    smooth = ha.smoothness(board)
-    weight = ha.weighted_board_score(board)
-    g = ha.prioritize_edges(board)
-    return zeros*100 #+ weight*1#+g*0.01 #* zeros**2# int(int(zeros)* (g)) # (smooth*0.01)#(weight/100)
+def score_board(board):
+    board[np.where(board == 0)] = 1
+    board_log = np.log2(board)
+    zeros = FACTOR_EMPTY_TILES*ha.count_zeros(board_log)
+    smooth = FACTOR_SMOOTHNESS*ha.smoothness(board_log)
+    weight = FACTOR_EDGES*ha.weighted_board_score(board_log)
+    g = FACTOR_BOARD_WEIGHT*ha.prioritize_edges(board_log)
+    #print(f"zeros: {zeros}, smooth: {smooth}, weight: {weight}, g: {g}")
+    return (zeros + weight + g)*smooth
 
