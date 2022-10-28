@@ -20,11 +20,15 @@ def find_best_move(board):
     UP, DOWN, LEFT, RIGHT = 0, 1, 2, 3
     move_args = [UP,DOWN,LEFT,RIGHT]
 
+    input("Next? ")
+
     result = [score_toplevel_move(i, board) for i in range(len(move_args))]
     bestmove = result.index(max(result))
 
     for m in move_args:
-        if m == UP: print_scores(board)
+        if m == UP: 
+            print_scores(board)
+            print(board)
         print("move: %d score: %.4f" % (m, result[m]))
     return bestmove
 
@@ -85,12 +89,12 @@ FACTOR_BOARD_WEIGHT = 1
 
 def score_board(board):
     zeros, smooth, weight, g = score(board)
-    return int((zeros + weight + g) * smooth)
+    return int((weight + g) * zeros * smooth)
 
 def score(board):
     board[np.where(board == 0)] = 1
     board_log = np.log2(board)
-    zeros = FACTOR_EMPTY_TILES*ha.count_zeros(board_log)
+    zeros = ha.zero_penalty(board_log) ** FACTOR_EMPTY_TILES
     smooth = FACTOR_SMOOTHNESS*ha.smoothness(board_log)
     weight = FACTOR_EDGES*ha.weighted_board_score(board_log)
     g = FACTOR_BOARD_WEIGHT*ha.prioritize_edges(board_log)

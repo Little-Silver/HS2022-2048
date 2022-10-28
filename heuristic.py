@@ -2,15 +2,14 @@ import numpy as np
 
 BOARD_SIZE = 16
 
-SCORE_TOP_LEFT = np.array([[2**15, 2**14, 2**13, 2**12], [2**8, 2**9, 2**10, 2**11], [2**7, 2**6, 2**5, 2**4], [0, 2**1, 2**2, 2**3]]) ** 2
-SCORE_TOP_RIGHT = np.array([[2**12, 2**13, 2**14, 2**15], [2**11, 2**10, 2**9, 2**8], [2**4, 2**5, 2**6, 2**7], [2**3, 2**2, 2**1, 0]]) ** 2
-SCORE_BOTTOM_LEFT = np.array([[0, 2**1, 2**2, 2**3], [2**7, 2**6, 2**5, 2**4], [2**8, 2**9, 2**10, 2**11], [2**15, 2**14, 2**13, 2**12]]) ** 2
-SCORE_BOTTOM_RIGHT = np.array([[2**3, 2**2, 2**1, 0], [2**4, 2**5, 2**6, 2**7], [2**11, 2**10, 2**9, 2**8], [2**12, 2**13, 2**14, 2**15]]) ** 2
+SCORE_TOP_LEFT = np.array([[15, 14, 13, 12], [8, 9, 10, 11], [7, 6, 5, 4], [0, 1, 2, 3]]) ** 2
+SCORE_TOP_RIGHT = np.array([[12, 13, 14, 15], [11, 10, 9, 8], [4, 5, 6, 7], [3, 2, 1, 0]]) ** 2
+SCORE_BOTTOM_LEFT = np.array([[0, 1, 2, 3], [7, 6, 5, 4], [8, 9, 10, 11], [15, 14, 13, 12]]) ** 2
+SCORE_BOTTOM_RIGHT = np.array([[3, 2, 1, 0], [4, 5, 6, 7], [11, 10, 9, 8], [12, 13, 14, 15]]) ** 2
 
 SCORE_BOARD_ARR = np.array([SCORE_TOP_LEFT, SCORE_TOP_RIGHT, SCORE_BOTTOM_LEFT, SCORE_BOTTOM_RIGHT])
 
 def smoothness(board):
-    #log_board = np.copy(board)
     ver = 1
     hor = 1
     for i in range(3):
@@ -28,8 +27,10 @@ def count_zeros(board):
     return (16 - np.count_nonzero(board))
 
 def zero_penalty(board):
-    return
+    zeros = count_zeros(board)
+    penalty = np.array([0.43, 0.53, 0.64, 0.72, 0.79, 0.85, 0.9, 0.94, 0.97, 0.99, 1, 1, 1, 1, 1, 1])
+    return penalty[zeros]
 
 def prioritize_edges(board):
-    score_board = np.array([[2, 1, 1, 2],[1, 0, 0, 1], [1, 0, 0, 1], [2, 1, 1, 2]])
+    score_board = np.array([[3, 2, 2, 3],[2, 0, 0, 2], [2, 0, 0, 2], [3, 2, 2, 3]])
     return np.sum(np.power(score_board, board))
