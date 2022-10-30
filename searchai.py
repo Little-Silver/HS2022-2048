@@ -1,6 +1,4 @@
 import numpy as np
-import multiprocessing
-from itertools import product
 import heuristic as ha
 import helper as help
 
@@ -18,13 +16,12 @@ UP, DOWN, LEFT, RIGHT = 0, 1, 2, 3
 # ********************************* MAIN *********************************
 def find_best_move(board):
     bestmove = -1
-    UP, DOWN, LEFT, RIGHT = 0, 1, 2, 3
     move_args = [UP, DOWN, LEFT, RIGHT]
 
     # input("Next? ")
 
     result = [score_toplevel_move(i, board) for i in range(len(move_args))]
-    bestmove = result.index(min(result))
+    bestmove = result.index(max(result))
 
     for m in move_args:
         if m == UP:
@@ -86,25 +83,28 @@ def simulate_move(board, depth, probability):
 
 
 # ********************************* SCORING *********************************
-FACTOR_EMPTY_TILES = 10
-FACTOR_SMOOTHNESS = 0.1
-FACTOR_EDGES = 1
-FACTOR_SNAKE = 1
-FACTOR_MONO = 3
+FACTOR_EMPTY_TILES = 1
+FACTOR_SMOOTHNESS = 1
+FACTOR_EDGES = 5
+FACTOR_BOARD_WEIGHT = 1
+
 
 def score_board(board):
-    zeros, smooth, snake, edge_priority, monotonicity = score(board)
-    return monotonicity# + zeros + smooth + snake + edge_priority 
+    zeros, smooth, weight, g = score(board)
+    return (weight + g) * zeros * smooth
+
 
 def score(board):
-    zeros = FACTOR_EMPTY_TILES*ha.zero_penalty(board)
-    smooth = FACTOR_SMOOTHNESS*ha.smoothness(board)
-    snake = FACTOR_SNAKE*ha.snake_score(board)
-    edge_priority = FACTOR_EDGES*ha.prioritize_edges(board)
-    monotonicity = FACTOR_MONO*ha.monotonicity(board)
-    return zeros, smooth, snake, edge_priority, monotonicity
+    # board[np.where(board == 0)] = 1
+    board_log = board  # np.log2(board)
+    zeros = ha.zero_penalty(board_log) ** FACTOR_EMPTY_TILES
+    smooth = ha.smoothness(board_log) / FACTOR_SMOOTHNESS
+    snake = FACTOR_EDGES * ha.snake_score(board_log)
+    edge_priority = FACTOR_BOARD_WEIGHT * ha.prioritize_edges(board_log)
+    return zeros, smooth, snake, edge_priority
+
 
 def print_scores(board):
-    zeros, smooth, snake, edge_priority, monotonicity = score(board)
+    zeros, smooth, snake, edge_priority = score(board)
     total = score_board(board)
-    print(f"total: {total}, zeros: {zeros}, smooth: {smooth}, snake: {snake}, edges: {edge_priority}, mono: {monotonicity}")
+    print(f"total: {total}, zeros: {zeros}, smooth: {smooth}, snake: {snake}, edges: {edge_priority}")
