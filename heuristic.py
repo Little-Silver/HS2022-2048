@@ -26,11 +26,35 @@ def smoothness(board):
 
 # It is optimal to have the board aligned in a snake form (from highest to lowest tile)
 def snake_score(board):
-    s_min = HIGH_VALUE
-    for SCORE_BOARD in SCORE_BOARD_ARR:
-        s_min = min(np.sum(np.multiply(board, SCORE_BOARD)), s_min)
-    return s_min
-    
+    snake_1 = 0
+    snake_2 = 0
+    snake_3 = 0
+    snake_4 = 0
+
+    for row in range(BOARD_WIDTH):
+
+        for col in range(BOARD_HEIGHT - 1):
+            if (row%2 == 0): 
+                if (board[row, col] < board[row, col + 1]):
+                    snake_1 += 1
+                if (board[col, row] < board[col + 1, row]):
+                    snake_2 += 1
+                if (board[row, col] > board[row, col + 1]):
+                    snake_3 += 1
+                if (board[col, row] > board[col + 1, row]):
+                    snake_4 += 1
+            else:
+                if (board[row, -1 - col] < board[row, -2 - col]):
+                    snake_1 += 1
+                if (board[-1 - col, row] < board[-2 - col, row]):
+                    snake_2 += 1  
+                if (board[row, -1 - col] > board[row, -2 - col]):
+                    snake_3 += 1
+                if (board[-1 - col, row] > board[-2 - col, row]):
+                    snake_4 += 1  
+
+    return min(snake_1, snake_2, snake_3, snake_4)
+
 # Helper function
 def count_zeros(board):
     return 16 - np.count_nonzero(board)

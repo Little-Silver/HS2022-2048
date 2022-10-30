@@ -62,7 +62,7 @@ def score_spawn_possibilities(board, depth, prob):
 def step(board, move, depth, prob):
     new_board = help.execute_move(move, board)
     if help.board_equals(board, new_board):
-        return 10000
+        return np.inf
     else:
         return score_spawn_possibilities(new_board, depth, prob)
 
@@ -83,8 +83,8 @@ def simulate_move(board, depth, probability):
 # ********************************* SCORING *********************************
 FACTOR_EMPTY_TILES = 1
 FACTOR_SMOOTHNESS = 1
-FACTOR_EDGES = 5
-FACTOR_BOARD_WEIGHT = 1
+FACTOR_EDGES = 1
+FACTOR_SNAKE = 1
 FACTOR_MONO = 1
 
 def score_board(board):
@@ -94,8 +94,8 @@ def score_board(board):
 def score(board):
     zeros = FACTOR_EMPTY_TILES*ha.zero_penalty(board)
     smooth = FACTOR_SMOOTHNESS*ha.smoothness(board)
-    snake = FACTOR_EDGES*ha.snake_score(board)
-    edge_priority = FACTOR_BOARD_WEIGHT*ha.prioritize_edges(board)
+    snake = FACTOR_SNAKE*ha.snake_score(board)
+    edge_priority = FACTOR_EDGES*ha.prioritize_edges(board)
     monotonicity = FACTOR_MONO*ha.monotonicity(board)
     return zeros, smooth, snake, edge_priority, monotonicity
 
