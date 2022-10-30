@@ -86,17 +86,18 @@ FACTOR_EMPTY_TILES = 1
 FACTOR_SMOOTHNESS = 1
 FACTOR_EDGES = 5
 FACTOR_BOARD_WEIGHT = 1
+FACTOR_MONO = 1
 
 def score_board(board):
     zeros, smooth, snake, edge_priority, monotonicity = score(board)
     return zeros + smooth + snake + edge_priority + monotonicity
 
 def score(board):
-    zeros = ha.zero_penalty(board) ** FACTOR_EMPTY_TILES
-    smooth = ha.smoothness(board)/FACTOR_SMOOTHNESS
+    zeros = FACTOR_EMPTY_TILES*ha.zero_penalty(board)
+    smooth = FACTOR_SMOOTHNESS*ha.smoothness(board)
     snake = FACTOR_EDGES*ha.snake_score(board)
     edge_priority = FACTOR_BOARD_WEIGHT*ha.prioritize_edges(board)
-    monotonicity = ha.monotonicity(board)
+    monotonicity = FACTOR_MONO*ha.monotonicity(board)
     return zeros, smooth, snake, edge_priority, monotonicity
 
 def print_scores(board):
