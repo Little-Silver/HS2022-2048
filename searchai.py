@@ -14,35 +14,37 @@ BOARD_HEIGHT = 4
 
 UP, DOWN, LEFT, RIGHT = 0, 1, 2, 3
 
+
 # ********************************* MAIN *********************************
 def find_best_move(board):
     bestmove = -1
     UP, DOWN, LEFT, RIGHT = 0, 1, 2, 3
-    move_args = [UP,DOWN,LEFT,RIGHT]
+    move_args = [UP, DOWN, LEFT, RIGHT]
 
-    #input("Next? ")
+    # input("Next? ")
 
     result = [score_toplevel_move(i, board) for i in range(len(move_args))]
     bestmove = result.index(min(result))
 
     for m in move_args:
-        if m == UP: 
+        if m == UP:
             print_scores(board)
             print(board)
         print("move: %d score: %.4f" % (m, result[m]))
     return bestmove
 
-def score_toplevel_move(move, board):
 
+def score_toplevel_move(move, board):
     zeros = ha.count_zeros(board)
 
     depth = 1
-    if(zeros < 4):
+    if (zeros < 4):
         depth = 2
     if (zeros < 2):
         depth = 3
 
     return step(board, move, depth, 1)
+
 
 # ********************************* EXPECTIMAX *********************************
 def score_spawn_possibilities(board, depth, prob):
@@ -54,32 +56,34 @@ def score_spawn_possibilities(board, depth, prob):
             if board[x][y] == 0:
                 board_with_2 = np.copy(board)
                 board_with_2[x][y] = 2
-                score += simulate_move(board_with_2, depth, prob*prob_2)
+                score += simulate_move(board_with_2, depth, prob * prob_2)
                 board_with_4 = np.copy(board)
                 board_with_4[x][y] = 4
-                score += simulate_move(board_with_4, depth, prob*prob_4)
+                score += simulate_move(board_with_4, depth, prob * prob_4)
     return score
+
 
 def step(board, move, depth, prob):
     new_board = help.execute_move(move, board)
     if help.board_equals(board, new_board):
-        return 1000
+        return 0
     else:
         return score_spawn_possibilities(new_board, depth, prob)
 
-def simulate_move(board, depth, probability):
 
+def simulate_move(board, depth, probability):
     if depth == 0:
         return probability * score_board(board)
-    
+
     depth -= 1
-    
+
     score_up = step(board, UP, depth, probability)
     score_left = step(board, LEFT, depth, probability)
     score_right = step(board, RIGHT, depth, probability)
     score_down = step(board, DOWN, depth, probability)
 
     return min(score_up, score_down, score_left, score_right)
+
 
 # ********************************* SCORING *********************************
 FACTOR_EMPTY_TILES = 10
