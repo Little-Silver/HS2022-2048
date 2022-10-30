@@ -88,19 +88,18 @@ FACTOR_EDGES = 5
 FACTOR_BOARD_WEIGHT = 1
 
 def score_board(board):
-    zeros, smooth, weight, g = score(board)
-    return (weight + g) * zeros * smooth
+    zeros, smooth, snake, edge_priority, monotonicity = score(board)
+    return zeros + smooth + snake + edge_priority + monotonicity
 
 def score(board):
-    #board[np.where(board == 0)] = 1
-    board_log = board#np.log2(board)
-    zeros = ha.zero_penalty(board_log) ** FACTOR_EMPTY_TILES
-    smooth = ha.smoothness(board_log)/FACTOR_SMOOTHNESS
-    snake = FACTOR_EDGES*ha.snake_score(board_log)
-    edge_priority = FACTOR_BOARD_WEIGHT*ha.prioritize_edges(board_log)
-    return zeros, smooth, snake, edge_priority
+    zeros = ha.zero_penalty(board) ** FACTOR_EMPTY_TILES
+    smooth = ha.smoothness(board)/FACTOR_SMOOTHNESS
+    snake = FACTOR_EDGES*ha.snake_score(board)
+    edge_priority = FACTOR_BOARD_WEIGHT*ha.prioritize_edges(board)
+    monotonicity = ha.monotonicity(board)
+    return zeros, smooth, snake, edge_priority, monotonicity
 
 def print_scores(board):
-    zeros, smooth, snake, edge_priority = score(board)
+    zeros, smooth, snake, edge_priority, monotonicity = score(board)
     total = score_board(board)
-    print(f"total: {total}, zeros: {zeros}, smooth: {smooth}, snake: {snake}, edges: {edge_priority}")
+    print(f"total: {total}, zeros: {zeros}, smooth: {smooth}, snake: {snake}, edges: {edge_priority}, mono: {monotonicity}")
