@@ -12,10 +12,10 @@
 
 import time
 
-import heuristicai as ai  # for task 4
+#import heuristicai as ai  # for task 4
 
 
-# import searchai as ai #for task 5
+import searchai as ai #for task 5
 # import heuristicai_SOLUTION as ai #for task 4
 # import searchai_SOLUTION as ai #for task 5
 
@@ -57,7 +57,7 @@ def play_game(gamectrl):
     moveno = 0
     start = time.time()
     while 1:
-        time.sleep(5)
+        time.sleep(.01)
         state = gamectrl.get_status()
         if state == 'ended':
             break

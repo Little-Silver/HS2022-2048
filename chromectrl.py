@@ -21,9 +21,12 @@ class ChromeDebuggerControl(object):
         elif len(pages) == 1:
             page = pages[0]
         else:
+            pageidx = 0
             print("Select a page to attach to:")
             for i, page in enumerate(pages):
-                print("%d) %s" % (i+1, page['title'].encode('unicode_escape')))
+                if("2048" == page['title']):
+                    print("%d) %s" % (i+1, page['title'].encode('unicode_escape')))
+                    pageidx = i
             while 1:
                 try:
                     pageidx = int(input("Selection? "))
