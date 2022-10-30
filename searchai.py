@@ -35,6 +35,7 @@ def find_best_move(board):
 def score_toplevel_move(move, board):
 
     zeros = ha.count_zeros(board)
+
     depth = 1
     if(zeros < 4):
         depth = 2
@@ -62,7 +63,7 @@ def score_spawn_possibilities(board, depth, prob):
 def step(board, move, depth, prob):
     new_board = help.execute_move(move, board)
     if help.board_equals(board, new_board):
-        return np.inf
+        return 1000
     else:
         return score_spawn_possibilities(new_board, depth, prob)
 
@@ -81,15 +82,15 @@ def simulate_move(board, depth, probability):
     return min(score_up, score_down, score_left, score_right)
 
 # ********************************* SCORING *********************************
-FACTOR_EMPTY_TILES = 1
-FACTOR_SMOOTHNESS = 1
+FACTOR_EMPTY_TILES = 10
+FACTOR_SMOOTHNESS = 0.1
 FACTOR_EDGES = 1
 FACTOR_SNAKE = 1
-FACTOR_MONO = 1
+FACTOR_MONO = 3
 
 def score_board(board):
     zeros, smooth, snake, edge_priority, monotonicity = score(board)
-    return zeros + smooth + snake + edge_priority + monotonicity
+    return monotonicity# + zeros + smooth + snake + edge_priority 
 
 def score(board):
     zeros = FACTOR_EMPTY_TILES*ha.zero_penalty(board)
