@@ -83,7 +83,7 @@ def simulate_move(board, depth, probability):
 
 
 # ********************************* SCORING *********************************
-FACTOR_EMPTY_TILES = 10
+FACTOR_EMPTY_TILES = 3
 FACTOR_SMOOTHNESS = 0.1
 FACTOR_EDGES = 1
 FACTOR_SNAKE = 1
@@ -91,7 +91,7 @@ FACTOR_MONO = 3
 
 def score_board(board):
     zeros, smooth, snake, edge_priority, monotonicity = score(board)
-    return monotonicity# + zeros + smooth + snake + edge_priority 
+    return monotonicity + zeros + smooth + snake + edge_priority 
 
 def score(board):
     zeros = FACTOR_EMPTY_TILES*ha.zero_penalty(board)
