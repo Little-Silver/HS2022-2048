@@ -60,7 +60,8 @@ What defines a good move?
 What defines a bad move?
 
 - Moves the highest tile out of a corner
-- 
+
+
 
 ## Heuristics
 
@@ -81,6 +82,10 @@ The difference between adjacent tiles should be as small as possible.
 The higher the value of a tile the better.
 
 - Prefer combinations with high numbers?
+
+### Snake board
+
+The board should look like a snake (highest to lowest number).
 
 ## Performance measure
 
@@ -109,3 +114,11 @@ Depth
 Simple starting strategy
 
 - At the start of the game it is very simple to get good results. Therefore one potential optimization is to use a very simple algorithm for the first X moves.
+
+Hash table
+
+- Use hash table to save calculated boards
+
+Zero score
+
+- Use zero score as optimal score.
