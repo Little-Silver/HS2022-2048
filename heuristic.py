@@ -11,24 +11,26 @@ SCORE_BOTTOM_RIGHT = np.array([[3, 2, 1, 0], [4, 5, 6, 7], [11, 10, 9, 8], [12, 
 
 SCORE_BOARD_ARR = np.array([SCORE_TOP_LEFT, SCORE_TOP_RIGHT, SCORE_BOTTOM_LEFT, SCORE_BOTTOM_RIGHT])
 
+HIGH_VALUE = 100
+
 # The difference between adjacent tiles should be rather low
 def smoothness(board):
-    ver = 1
-    hor = 1
+    ver = 0
+    hor = 0
     for i in range(3):
         ver += np.sum(abs(board[i] - board[i+1]))
         hor += np.sum(abs(board[:,i] - board[:,i+1]))
-    return (1/(min(ver, hor)))
+    return min(ver, hor)
 
 # It is optimal to have the board aligned in a snake form (from highest to lowest tile)
 def snake_score(board):
-    s_max = 0
+    s_min = HIGH_VALUE
     for SCORE_BOARD in SCORE_BOARD_ARR:
-        s_max = max(np.sum(np.multiply(board, SCORE_BOARD)), s_max)
-    return s_max
+        s_min = min(np.sum(np.multiply(board, SCORE_BOARD)), s_min)
+    return s_min
 
 def count_zeros(board):
-    return (16 - np.count_nonzero(board))
+    return np.count_nonzero(board)
 
 # Having more zeros is better than having few
 def zero_penalty(board):
