@@ -23,7 +23,7 @@ def find_best_move(board):
     input("Next? ")
 
     result = [score_toplevel_move(i, board) for i in range(len(move_args))]
-    bestmove = result.index(max(result))
+    bestmove = result.index(min(result))
 
     for m in move_args:
         if m == UP: 
@@ -63,7 +63,7 @@ def score_spawn_possibilities(board, depth, prob):
 def step(board, move, depth, prob):
     new_board = help.execute_move(move, board)
     if help.board_equals(board, new_board):
-        return 0
+        return 10000
     else:
         return score_spawn_possibilities(new_board, depth, prob)
 
@@ -79,7 +79,7 @@ def simulate_move(board, depth, probability):
     score_right = step(board, RIGHT, depth, probability)
     score_down = step(board, DOWN, depth, probability)
 
-    return max(score_up, score_down, score_left, score_right)
+    return min(score_up, score_down, score_left, score_right)
 
 # ********************************* SCORING *********************************
 FACTOR_EMPTY_TILES = 1
