@@ -88,6 +88,7 @@ FACTOR_SMOOTHNESS = 0.1
 FACTOR_EDGES = 1
 FACTOR_SNAKE = 1
 FACTOR_MONO = 3
+FACTOR_HIGHEST = 5
 
 def score_board(board):
     zeros, smooth, snake, edge_priority, monotonicity, highest_tile = score(board)
@@ -99,7 +100,7 @@ def score(board):
     snake = FACTOR_SNAKE*ha.snake_score(board)
     edge_priority = FACTOR_EDGES*ha.prioritize_edges(board)
     monotonicity = FACTOR_MONO*ha.monotonicity(board)
-    highest_tile = ha.highest_tile(board)
+    highest_tile = FACTOR_HIGHEST*ha.highest_tile(board)
     return zeros, smooth, snake, edge_priority, monotonicity, highest_tile
 
 
