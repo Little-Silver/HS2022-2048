@@ -83,27 +83,26 @@ def simulate_move(board, depth, probability):
 
 
 # ********************************* SCORING *********************************
-FACTOR_EMPTY_TILES = 1
-FACTOR_SMOOTHNESS = 1
-FACTOR_EDGES = 5
-FACTOR_BOARD_WEIGHT = 1
-
+FACTOR_EMPTY_TILES = 10
+FACTOR_SMOOTHNESS = 0.1
+FACTOR_EDGES = 1
+FACTOR_SNAKE = 1
+FACTOR_MONO = 3
 
 def score_board(board):
     zeros, smooth, snake, edge_priority, monotonicity = score(board)
     return monotonicity# + zeros + smooth + snake + edge_priority 
 
 def score(board):
-    # board[np.where(board == 0)] = 1
-    board_log = board  # np.log2(board)
-    zeros = ha.zero_penalty(board_log) ** FACTOR_EMPTY_TILES
-    smooth = ha.smoothness(board_log) / FACTOR_SMOOTHNESS
-    snake = FACTOR_EDGES * ha.snake_score(board_log)
-    edge_priority = FACTOR_BOARD_WEIGHT * ha.prioritize_edges(board_log)
-    return zeros, smooth, snake, edge_priority
+    zeros = FACTOR_EMPTY_TILES*ha.zero_penalty(board)
+    smooth = FACTOR_SMOOTHNESS*ha.smoothness(board)
+    snake = FACTOR_SNAKE*ha.snake_score(board)
+    edge_priority = FACTOR_EDGES*ha.prioritize_edges(board)
+    monotonicity = FACTOR_MONO*ha.monotonicity(board)
+    return zeros, smooth, snake, edge_priority, monotonicity
 
 
 def print_scores(board):
-    zeros, smooth, snake, edge_priority = score(board)
+    zeros, smooth, snake, edge_priority, monotonicity = score(board)
     total = score_board(board)
-    print(f"total: {total}, zeros: {zeros}, smooth: {smooth}, snake: {snake}, edges: {edge_priority}")
+    print(f"total: {total}, zeros: {zeros}, smooth: {smooth}, snake: {snake}, edges: {edge_priority}, mono: {monotonicity}")
