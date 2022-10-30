@@ -92,7 +92,7 @@ FACTOR_HIGHEST = 5
 
 def score_board(board):
     zeros, smooth, snake, edge_priority, monotonicity, highest_tile = score(board)
-    return monotonicity + zeros + smooth + snake + edge_priority 
+    return monotonicity + zeros + smooth + snake + edge_priority + highest_tile
 
 def score(board):
     zeros = FACTOR_EMPTY_TILES*ha.zero_penalty(board)
