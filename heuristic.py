@@ -26,34 +26,47 @@ def smoothness(board):
 
 # It is optimal to have the board aligned in a snake form (from highest to lowest tile)
 def snake_score(board):
-    snake_1 = 0
-    snake_2 = 0
-    snake_3 = 0
-    snake_4 = 0
+    snake = np.zeros((8))
 
     for row in range(BOARD_WIDTH):
 
         for col in range(BOARD_HEIGHT - 1):
             if (row%2 == 0): 
                 if (board[row, col] < board[row, col + 1]):
-                    snake_1 += 1
+                    snake[0] += 1
                 if (board[col, row] < board[col + 1, row]):
-                    snake_2 += 1
+                    snake[1] += 1
                 if (board[row, col] > board[row, col + 1]):
-                    snake_3 += 1
+                    snake[2] += 1
                 if (board[col, row] > board[col + 1, row]):
-                    snake_4 += 1
+                    snake[3] += 1
+                if (board[row, -1 - col] < board[row, -2 - col]):
+                    snake[4] += 1
+                if (board[-1 - col, row] < board[-2 - col, row]):
+                    snake[5] += 1  
+                if (board[row, -1 - col] > board[row, -2 - col]):
+                    snake[6] += 1
+                if (board[-1 - col, row] > board[-2 - col, row]):
+                    snake[7] += 1 
             else:
                 if (board[row, -1 - col] < board[row, -2 - col]):
-                    snake_1 += 1
+                    snake[0] += 1
                 if (board[-1 - col, row] < board[-2 - col, row]):
-                    snake_2 += 1  
+                    snake[1] += 1  
                 if (board[row, -1 - col] > board[row, -2 - col]):
-                    snake_3 += 1
+                    snake[2] += 1
                 if (board[-1 - col, row] > board[-2 - col, row]):
-                    snake_4 += 1  
+                    snake[3] += 1  
+                if (board[row, col] < board[row, col + 1]):
+                    snake[4] += 1
+                if (board[col, row] < board[col + 1, row]):
+                    snake[5] += 1
+                if (board[row, col] > board[row, col + 1]):
+                    snake[6] += 1
+                if (board[col, row] > board[col + 1, row]):
+                    snake[7] += 1
 
-    return min(snake_1, snake_2, snake_3, snake_4)
+    return np.min(snake)
 
 # Helper function
 def count_zeros(board):
@@ -62,37 +75,32 @@ def count_zeros(board):
 # Having more zeros is better than having few
 def zero_penalty(board):
     zeros = count_zeros(board)
-    penalty = np.array([0.43, 0.53, 0.64, 0.72, 0.79, 0.85, 0.9, 0.94, 0.97, 0.99, 1, 1, 1, 1, 1, 1, 1])
+    penalty = np.array([1, 0.7, 0.5, 0.3, 0.2, 0.15, 0.1, 0.05, 0, 0, 0, 0, 0, 0, 0, 0])
     return penalty[zeros]
 
 # High tiles should remain in corners or edges
 def prioritize_edges(board):
-    score_board = np.array([[3, 2, 2, 3], [2, 0, 0, 2], [2, 0, 0, 2], [3, 2, 2, 3]])
+    score_board = np.array([[0, 1e-3, 1e-3, 0],[1e-3, 1e-2, 1e-2, 1e-3], [1e-3, 1e-2, 1e-2, 1e-3], [0, 1e-3, 1e-3, 0]])
     return np.sum(np.multiply(score_board, board))
-
 
 # Values going from one corner to an oposing corner should all be either increasing or decreasing
 def monotonicity(board):
-    mono = 0
+    mono = 24
 
     for r in board:
-        if r[0] < r[1]:
-            diff = 1
-        else:
-            diff = -1
+        if (r[0] < r[1]): diff = 1
+        else: diff = -1
         for i in range(BOARD_WIDTH - 1):
             if (r[i] - r[i + 1]) * diff <= 0:
-                mono += 1
+                mono -= 1
             diff = r[i] - r[i + 1]
 
     for j in range(4):
-        if board[0][j] < board[1][j]:
-            diff = 1
-        else:
-            diff = -1
+        if (board[0][j] < board[1][j]): diff = 1
+        else: diff = -1
         for k in range(BOARD_HEIGHT - 1):
             if (board[k][j] - board[k + 1][j]) * diff <= 0:
-                mono += 1
+                mono -= 1
             diff = board[k][j] - board[k + 1][j]
 
     return mono
