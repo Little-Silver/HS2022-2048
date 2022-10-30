@@ -20,7 +20,7 @@ def find_best_move(board):
     UP, DOWN, LEFT, RIGHT = 0, 1, 2, 3
     move_args = [UP,DOWN,LEFT,RIGHT]
 
-    input("Next? ")
+    #input("Next? ")
 
     result = [score_toplevel_move(i, board) for i in range(len(move_args))]
     bestmove = result.index(min(result))
@@ -35,7 +35,6 @@ def find_best_move(board):
 def score_toplevel_move(move, board):
 
     zeros = ha.count_zeros(board)
-    
     depth = 1
     if(zeros < 4):
         depth = 2

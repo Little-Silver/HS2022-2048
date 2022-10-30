@@ -30,18 +30,16 @@ def snake_score(board):
     for SCORE_BOARD in SCORE_BOARD_ARR:
         s_min = min(np.sum(np.multiply(board, SCORE_BOARD)), s_min)
     return s_min
-
-
+    
+# Helper function
 def count_zeros(board):
-    return np.count_nonzero(board)
-
+    return 16 - np.count_nonzero(board)
 
 # Having more zeros is better than having few
 def zero_penalty(board):
     zeros = count_zeros(board)
-    penalty = np.array([0.43, 0.53, 0.64, 0.72, 0.79, 0.85, 0.9, 0.94, 0.97, 0.99, 1, 1, 1, 1, 1, 1])
+    penalty = np.array([0.43, 0.53, 0.64, 0.72, 0.79, 0.85, 0.9, 0.94, 0.97, 0.99, 1, 1, 1, 1, 1, 1, 1])
     return penalty[zeros]
-
 
 # High tiles should remain in corners or edges
 def prioritize_edges(board):
