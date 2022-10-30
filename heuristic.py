@@ -118,6 +118,13 @@ def prioritize_edges(board):
     score_board = np.array([[3, 2, 2, 3], [2, 0, 0, 2], [2, 0, 0, 2], [3, 2, 2, 3]])
     return np.sum(np.multiply(score_board, board)) / 100
 
+def highest_tile(board):
+    highest_corners = max(board[0,0],board[0,3],board[3,0],board[3,3])
+    highest_tile = np.max(board)
+    if (highest_tile == highest_corners):
+        return np.log2(highest_tile)
+    else:
+        return 0
 
 # Values going from one corner to an oposing corner should all be either increasing or decreasing
 def monotonicity(board):
