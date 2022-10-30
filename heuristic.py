@@ -26,7 +26,7 @@ def smoothness(board):
 
 # It is optimal to have the board aligned in a snake form (from highest to lowest tile)
 def snake_score(board):
-    snake = np.zeros((8))
+    snake = np.zeros(8)
 
     for row in range(BOARD_WIDTH):
 
@@ -70,9 +70,30 @@ def snake_score(board):
 
 
 def snake_score_variant(board):
-    snake_array = np.array([board[0], np.flip(board[1]), board[2], np.flip(board[3])]).flatten()
-    score = length_longest_descending_sequence(snake_array)
-    return score
+    snake_array = np.array([]).reshape(1, 8)
+    # top left to bottom right (horizontal)
+    snake_array[0] = np.array([board[0], np.flip(board[1]), board[2], np.flip(board[3])]).flatten()
+    # bottom right to top left (horizontal)
+    snake_array[1] = np.flip(snake_array[0].copy())
+    # top right to bottom left (horizontal)
+    snake_array[2] = np.array([np.flip(board[0]), board[1], np.flip(board[2]), board[3]]).flatten()
+    # bottom left to bottom right (horizontal)
+    snake_array[3] = np.flip(snake_array[2].copy())
+
+    # top left to bottom right (vertical)
+    snake_array[4] = np.array([board[:, 0], np.flip(board[:, 1]), board[:, 2], np.flip(board[:, 3])]).flatten()
+    # bottom right to top left (vertical)
+    snake_array[5] = np.flip(snake_array[4].copy())
+    # top right to bottom left (vertical)
+    snake_array[6] = np.array([np.flip(board[:, 0]), board[:, 1], np.flip(board[:, 2]), board[:, 3]]).flatten()
+    # bottom left to bottom right (vertical)
+    snake_array[7] = np.flip(snake_array[6].copy())
+
+    score = np.array([]).reshape(8)
+    for i in range(8):
+        score[i] = length_longest_descending_sequence(snake_array[i])
+
+    return np.max(score)
 
 
 # returns length of the longest descending sequence in array
@@ -111,7 +132,7 @@ def monotonicity(board):
     mono = 24
 
     for r in board:
-        if (r[0] < r[1]):
+        if r[0] < r[1]:
             diff = 1
         else:
             diff = -1
@@ -121,7 +142,7 @@ def monotonicity(board):
             diff = r[i] - r[i + 1]
 
     for j in range(4):
-        if (board[0][j] < board[1][j]):
+        if board[0][j] < board[1][j]:
             diff = 1
         else:
             diff = -1
