@@ -31,7 +31,7 @@ def snake_score(board):
     for row in range(BOARD_WIDTH):
 
         for col in range(BOARD_HEIGHT - 1):
-            if (row%2 == 0): 
+            if (row % 2 == 0):
                 if (board[row, col] < board[row, col + 1]):
                     snake[0] += 1
                 if (board[col, row] < board[col + 1, row]):
@@ -43,20 +43,20 @@ def snake_score(board):
                 if (board[row, -1 - col] < board[row, -2 - col]):
                     snake[4] += 1
                 if (board[-1 - col, row] < board[-2 - col, row]):
-                    snake[5] += 1  
+                    snake[5] += 1
                 if (board[row, -1 - col] > board[row, -2 - col]):
                     snake[6] += 1
                 if (board[-1 - col, row] > board[-2 - col, row]):
-                    snake[7] += 1 
+                    snake[7] += 1
             else:
                 if (board[row, -1 - col] < board[row, -2 - col]):
                     snake[0] += 1
                 if (board[-1 - col, row] < board[-2 - col, row]):
-                    snake[1] += 1  
+                    snake[1] += 1
                 if (board[row, -1 - col] > board[row, -2 - col]):
                     snake[2] += 1
                 if (board[-1 - col, row] > board[-2 - col, row]):
-                    snake[3] += 1  
+                    snake[3] += 1
                 if (board[row, col] < board[row, col + 1]):
                     snake[4] += 1
                 if (board[col, row] < board[col + 1, row]):
@@ -68,9 +68,30 @@ def snake_score(board):
 
     return np.min(snake)
 
+
+def snake_score_variant(board):
+    snake_array = np.array([board[0], np.flip(board[1]), board[2], np.flip(board[3])]).flatten()
+    score = length_longest_descending_sequence(snake_array)
+    return score
+
+
+# returns length of the longest descending sequence in array
+def length_longest_descending_sequence(array):
+    length = 0
+    max_length = 0
+    for i in range(len(array) - 1):
+        if array[i + 1] > array[i]:
+            max_length = length
+            length = 0
+        else:
+            length += 1
+    return max(length, max_length)
+
+
 # Helper function
 def count_zeros(board):
     return 16 - np.count_nonzero(board)
+
 
 # Having more zeros is better than having few
 def zero_penalty(board):
@@ -78,26 +99,32 @@ def zero_penalty(board):
     penalty = np.array([1, 0.7, 0.5, 0.3, 0.2, 0.15, 0.1, 0.05, 0, 0, 0, 0, 0, 0, 0, 0])
     return penalty[zeros]
 
+
 # High tiles should remain in corners or edges
 def prioritize_edges(board):
-    score_board = np.array([[0, 1e-3, 1e-3, 0],[1e-3, 1e-2, 1e-2, 1e-3], [1e-3, 1e-2, 1e-2, 1e-3], [0, 1e-3, 1e-3, 0]])
+    score_board = np.array([[0, 1e-3, 1e-3, 0], [1e-3, 1e-2, 1e-2, 1e-3], [1e-3, 1e-2, 1e-2, 1e-3], [0, 1e-3, 1e-3, 0]])
     return np.sum(np.multiply(score_board, board))
+
 
 # Values going from one corner to an oposing corner should all be either increasing or decreasing
 def monotonicity(board):
     mono = 24
 
     for r in board:
-        if (r[0] < r[1]): diff = 1
-        else: diff = -1
+        if (r[0] < r[1]):
+            diff = 1
+        else:
+            diff = -1
         for i in range(BOARD_WIDTH - 1):
             if (r[i] - r[i + 1]) * diff <= 0:
                 mono -= 1
             diff = r[i] - r[i + 1]
 
     for j in range(4):
-        if (board[0][j] < board[1][j]): diff = 1
-        else: diff = -1
+        if (board[0][j] < board[1][j]):
+            diff = 1
+        else:
+            diff = -1
         for k in range(BOARD_HEIGHT - 1):
             if (board[k][j] - board[k + 1][j]) * diff <= 0:
                 mono -= 1
