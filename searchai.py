@@ -24,7 +24,7 @@ def find_best_move(board):
     # input("Next? ")
 
     result = [score_toplevel_move(i, board) for i in range(len(move_args))]
-    bestmove = result.index(min(result))
+    bestmove = result.index(max(result))
 
     for m in move_args:
         if m == UP:
@@ -82,7 +82,7 @@ def simulate_move(board, depth, probability):
     score_right = step(board, RIGHT, depth, probability)
     score_down = step(board, DOWN, depth, probability)
 
-    return min(score_up, score_down, score_left, score_right)
+    return max(score_up, score_down, score_left, score_right)
 
 
 # ********************************* SCORING *********************************
@@ -94,7 +94,7 @@ FACTOR_MONO = 3
 
 def score_board(board):
     zeros, smooth, snake, edge_priority, monotonicity = score(board)
-    return monotonicity# + zeros + smooth + snake + edge_priority 
+    return monotonicity + zeros + smooth + snake + edge_priority 
 
 def score(board):
     zeros = FACTOR_EMPTY_TILES*ha.zero_penalty(board)

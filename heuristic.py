@@ -7,12 +7,13 @@ BOARD_HEIGHT = 4
 
 # The difference between adjacent tiles should be rather low
 def smoothness(board):
+    np.sum(board)
     ver = 1
     hor = 1
     for i in range(3):
         ver += np.sum(abs(board[i] - board[i + 1]))
         hor += np.sum(abs(board[:, i] - board[:, i + 1]))
-    return 1 / (min(ver, hor))
+    return max(0, np.sum(board) - (min(ver, hor)))
 
 
 # It is optimal to have the board aligned in a snake form (from highest to lowest tile)
@@ -115,7 +116,7 @@ def zero_penalty(board):
 # High tiles should remain in corners or edges
 def prioritize_edges(board):
     score_board = np.array([[3, 2, 2, 3], [2, 0, 0, 2], [2, 0, 0, 2], [3, 2, 2, 3]])
-    return np.sum(np.multiply(score_board, board))
+    return np.sum(np.multiply(score_board, board)) / 100
 
 
 # Values going from one corner to an oposing corner should all be either increasing or decreasing
@@ -129,7 +130,7 @@ def monotonicity(board):
             diff = -1
         for i in range(BOARD_WIDTH - 1):
             if (r[i] - r[i + 1]) * diff <= 0:
-                mono += 1
+                mono += np.log2(abs(r[i] - r[i + 1])+1)
             diff = r[i] - r[i + 1]
 
     for j in range(4):
@@ -139,7 +140,7 @@ def monotonicity(board):
             diff = -1
         for k in range(BOARD_HEIGHT - 1):
             if (board[k][j] - board[k + 1][j]) * diff <= 0:
-                mono += 1
+                mono += np.log2(abs(board[k][j] - board[k + 1][j])+1)
             diff = board[k][j] - board[k + 1][j]
 
-    return mono
+    return mono/10
