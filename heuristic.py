@@ -1,4 +1,5 @@
 import numpy as np
+from numba import njit
 
 BOARD_SIZE = 16
 BOARD_WIDTH = 4
@@ -10,7 +11,7 @@ def smoothness(board):
     np.sum(board)
     ver = 1
     hor = 1
-    for i in range(3):
+    for i in iter(range(3)):
         ver += np.sum(abs(board[i] - board[i + 1]))
         hor += np.sum(abs(board[:, i] - board[:, i + 1]))
     return max(0, np.sum(board) - (min(ver, hor)))
@@ -112,7 +113,6 @@ def zero_penalty(board):
     penalty = np.array([0.43, 0.53, 0.64, 0.72, 0.79, 0.85, 0.9, 0.94, 0.97, 0.99, 1, 1, 1, 1, 1, 1])
     return penalty[zeros]
 
-
 # High tiles should remain in corners or edges
 def prioritize_edges(board):
     score_board = np.array([[3, 2, 2, 3], [2, 0, 0, 2], [2, 0, 0, 2], [3, 2, 2, 3]])
@@ -127,6 +127,7 @@ def highest_tile(board):
         return 0
 
 # Values going from one corner to an oposing corner should all be either increasing or decreasing
+@njit
 def monotonicity(board):
     mono = 0
 
