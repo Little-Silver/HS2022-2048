@@ -12,7 +12,7 @@ BOARD_HEIGHT = 4
 
 UP, DOWN, LEFT, RIGHT = 0, 1, 2, 3
 
-MIN_PROB = 0.0001
+MIN_PROB = 0.0005
 
 
 # ********************************* MAIN *********************************
@@ -36,29 +36,27 @@ def find_best_move(board):
 def score_toplevel_move(move, board):
     zeros = ha.count_zeros(board)
 
-    depth = 1
-    if (zeros < 4):
-        depth = 2
+    depth = 2
     if (zeros < 2):
         depth = 3
+    if (zeros < 0):
+        depth = 4
 
     return step(board, move, depth, 1)
 
 
 # ********************************* EXPECTIMAX *********************************
 def score_spawn_possibilities(board, depth, prob):
-    prob_2 = 0.9 / ha.count_zeros(board)
-    prob_4 = 0.1 / ha.count_zeros(board)
-    score = 1
-    for x in range(BOARD_WIDTH):
-        for y in range(BOARD_HEIGHT):
-            if board[x][y] == 0:
-                board_with_2 = np.copy(board)
-                board_with_2[x][y] = 2
-                score += simulate_move(board_with_2, depth, prob * prob_2)
-                board_with_4 = np.copy(board)
-                board_with_4[x][y] = 4
-                score += simulate_move(board_with_4, depth, prob * prob_4)
+    zeros = ha.count_zeros(board)
+    prob_2 = 0.9 / zeros
+    prob_4 = 0.1 / zeros
+   
+    score = 10 + np.sum(np.array([
+        simulate_move(x, y, 2, board, depth, prob * prob_2) + 
+        simulate_move(x, y, 4, board, depth, prob * prob_4)
+        for (x,y), val in np.ndenumerate(board) if val == 0
+        ]))
+
     return score
 
 
@@ -70,7 +68,9 @@ def step(board, move, depth, prob):
         return score_spawn_possibilities(new_board, depth, prob)
 
 
-def simulate_move(board, depth, probability):
+def simulate_move(x, y, val, board, depth, probability):
+    board = np.copy(board)
+    board[x][y] = val
     if depth == 0 or probability <= MIN_PROB:
         return probability * score_board(board)
 
@@ -97,10 +97,10 @@ def score_board(board):
     return monotonicity + zeros  + highest_tile+ edge_priority + smooth#+ snake + smooth
 
 def score(board):
-    zeros = FACTOR_EMPTY_TILES*ha.zero_penalty(board)
+    zeros = 0#FACTOR_EMPTY_TILES*ha.zero_penalty(board)
     smooth = FACTOR_SMOOTHNESS*ha.smoothness(board)
     snake = 0#FACTOR_SNAKE*ha.snake_score(board)
-    edge_priority =FACTOR_EDGES*ha.prioritize_edges(board)
+    edge_priority =0#FACTOR_EDGES*ha.prioritize_edges(board)
     monotonicity = FACTOR_MONO*ha.monotonicity(board)
     highest_tile = FACTOR_HIGHEST*ha.highest_tile(board)
     return zeros, smooth, snake, edge_priority, monotonicity, highest_tile
