@@ -139,7 +139,7 @@ def monotonicity(board):
                 diff = 1
             else:
                 diff = -1
-    print(mono)
+
     for j in range(4):
         if board[0][j] < board[1][j]:
             diff = 1
@@ -152,5 +152,5 @@ def monotonicity(board):
                 diff = 1
             else:
                 diff = -1            
-    print(mono)
+
     return mono
