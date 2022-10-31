@@ -5,6 +5,8 @@ import searchai as sa
 import numpy as np
 from parameterized import parameterized
 
+from numba import njit
+
 # RUN: nosetests -v score_test.py
 
 class TestBoards(unittest.TestCase):

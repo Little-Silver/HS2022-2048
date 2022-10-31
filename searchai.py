@@ -36,11 +36,11 @@ def find_best_move(board):
 def score_toplevel_move(move, board):
     zeros = ha.count_zeros(board)
 
-    depth = 2
+    depth = 1
+    if (zeros < 5):
+        depth = 2
     if (zeros < 2):
         depth = 3
-    if (zeros < 0):
-        depth = 4
 
     return step(board, move, depth, 1)
 
@@ -89,8 +89,8 @@ FACTOR_EMPTY_TILES = 3
 FACTOR_SMOOTHNESS = 0.1
 FACTOR_EDGES = 1
 FACTOR_SNAKE = 1
-FACTOR_MONO = 3
-FACTOR_HIGHEST = 4
+FACTOR_MONO = 2
+FACTOR_HIGHEST = 3
 
 def score_board(board):
     zeros, smooth, snake, edge_priority, monotonicity, highest_tile = score(board)
@@ -101,8 +101,8 @@ def score(board):
     smooth = FACTOR_SMOOTHNESS*ha.smoothness(board)
     snake = 0#FACTOR_SNAKE*ha.snake_score(board)
     edge_priority =0#FACTOR_EDGES*ha.prioritize_edges(board)
-    monotonicity = 0#FACTOR_MONO*ha.monotonicity(board)
-    highest_tile = 0#FACTOR_HIGHEST*ha.highest_tile(board)
+    monotonicity = FACTOR_MONO*ha.monotonicity(board)
+    highest_tile = FACTOR_HIGHEST*ha.highest_tile(board)
     return zeros, smooth, snake, edge_priority, monotonicity, highest_tile
 
 

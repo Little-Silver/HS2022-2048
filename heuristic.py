@@ -10,7 +10,7 @@ BOARD_HEIGHT = 4
 def smoothness(board):
     hor = 1 + np.sum(np.abs(np.diff(board, axis=1)))
     ver = 1 + np.sum(np.abs(np.diff(board, axis=0)))
-    return max(0, 2*np.sum(board) - (min(ver, hor)))
+    return max(0, 2*np.sum(board) - ((ver + hor)/2))
 
 
 # It is optimal to have the board aligned in a snake form (from highest to lowest tile)
@@ -123,7 +123,7 @@ def highest_tile(board):
         return 0
 
 # Values going from one corner to an oposing corner should all be either increasing or decreasing
-@njit
+#@njit
 def monotonicity(board):
     mono = 0
 
@@ -135,8 +135,11 @@ def monotonicity(board):
         for i in range(BOARD_WIDTH - 1):
             if (r[i] - r[i + 1]) * diff <= 0:
                 mono += 1
-            diff = r[i] - r[i + 1]
-
+            if r[i] < r[i+1]:
+                diff = 1
+            else:
+                diff = -1
+    print(mono)
     for j in range(4):
         if board[0][j] < board[1][j]:
             diff = 1
@@ -145,6 +148,9 @@ def monotonicity(board):
         for k in range(BOARD_HEIGHT - 1):
             if (board[k][j] - board[k + 1][j]) * diff <= 0:
                 mono += 1
-            diff = board[k][j] - board[k + 1][j]
-
+            if board[k][j] < board[k + 1][j]:
+                diff = 1
+            else:
+                diff = -1            
+    print(mono)
     return mono
