@@ -61,7 +61,7 @@ class TestBoards(unittest.TestCase):
         score_suboptimal = sa.score_board(b2)
         msg = "\nCase {0}: \nBoard 1 (Score = {1}): \n{2} \nBoard 2 (Score = {3}): \n{4}".format(i, score_optimal, b1, 
                                                                                                     score_suboptimal, b2)
-        self.assertTrue(score_optimal < score_suboptimal, msg)
+        self.assertTrue(score_optimal > score_suboptimal, msg)
 
 if __name__ == '__main__':
     unittest.main()

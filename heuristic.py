@@ -137,7 +137,7 @@ def monotonicity(board):
             diff = -1
         for i in range(BOARD_WIDTH - 1):
             if (r[i] - r[i + 1]) * diff <= 0:
-                mono += np.log2(abs(r[i] - r[i + 1])+1)
+                mono += 1
             diff = r[i] - r[i + 1]
 
     for j in range(4):
@@ -147,7 +147,7 @@ def monotonicity(board):
             diff = -1
         for k in range(BOARD_HEIGHT - 1):
             if (board[k][j] - board[k + 1][j]) * diff <= 0:
-                mono += np.log2(abs(board[k][j] - board[k + 1][j])+1)
+                mono += 1
             diff = board[k][j] - board[k + 1][j]
 
-    return mono/10
+    return mono
