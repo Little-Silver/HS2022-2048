@@ -8,13 +8,9 @@ BOARD_HEIGHT = 4
 
 # The difference between adjacent tiles should be rather low
 def smoothness(board):
-    np.sum(board)
-    ver = 1
-    hor = 1
-    for i in iter(range(3)):
-        ver += np.sum(abs(board[i] - board[i + 1]))
-        hor += np.sum(abs(board[:, i] - board[:, i + 1]))
-    return max(0, np.sum(board) - (min(ver, hor)))
+    hor = 1 + np.sum(np.abs(np.diff(board, axis=1)))
+    ver = 1 + np.sum(np.abs(np.diff(board, axis=0)))
+    return max(0, 2*np.sum(board) - (min(ver, hor)))
 
 
 # It is optimal to have the board aligned in a snake form (from highest to lowest tile)
