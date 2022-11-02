@@ -12,7 +12,7 @@ BOARD_HEIGHT = 4
 
 UP, DOWN, LEFT, RIGHT = 0, 1, 2, 3
 
-MIN_PROB = 0.0005
+MIN_PROB = 0.001
 
 
 # ********************************* MAIN *********************************
@@ -36,11 +36,11 @@ def find_best_move(board):
 def score_toplevel_move(move, board):
     zeros = ha.count_zeros(board)
 
-    depth = 1
+    depth = 2
     if (zeros < 5):
-        depth = 2
-    if (zeros < 2):
         depth = 3
+    if (zeros < 3):
+        depth = 4
 
     return step(board, move, depth, 1)
 
@@ -85,22 +85,38 @@ def simulate_move(x, y, val, board, depth, probability):
 
 
 # ********************************* SCORING *********************************
-FACTOR_EMPTY_TILES = 3
+FACTOR_EMPTY_TILES = 0.3
 FACTOR_SMOOTHNESS = 0.1
 FACTOR_EDGES = 1
 FACTOR_SNAKE = 1
-FACTOR_MONO = 2
-FACTOR_HIGHEST = 3
+FACTOR_MONO = 0.1
+FACTOR_HIGHEST = 0.2
+
+score_table = dict()
 
 def score_board(board):
+    result = get_existing_score(board)
+    if result != -1:
+        return result
     zeros, smooth, snake, edge_priority, monotonicity, highest_tile = score(board)
-    return monotonicity + zeros  + highest_tile+ edge_priority + smooth#+ snake + smooth
+    result = monotonicity*smooth + zeros  + highest_tile+ edge_priority#+ snake + smooth
+    add_score(board, result)
+    return result
+
+def get_existing_score(board):
+    key = board.tobytes()
+    if key in score_table:
+        return score_table[key]
+    return -1
+def add_score(board, score):
+    score_table[board.tobytes()] = score
 
 def score(board):
-    zeros = 0#FACTOR_EMPTY_TILES*ha.zero_penalty(board)
+
+    zeros = FACTOR_EMPTY_TILES*ha.zero_score(board)
     smooth = FACTOR_SMOOTHNESS*ha.smoothness(board)
     snake = 0#FACTOR_SNAKE*ha.snake_score(board)
-    edge_priority =0#FACTOR_EDGES*ha.prioritize_edges(board)
+    edge_priority = 0#FACTOR_EDGES*ha.prioritize_edges(board)
     monotonicity = FACTOR_MONO*ha.monotonicity(board)
     highest_tile = FACTOR_HIGHEST*ha.highest_tile(board)
     return zeros, smooth, snake, edge_priority, monotonicity, highest_tile
@@ -109,4 +125,4 @@ def score(board):
 def print_scores(board):
     zeros, smooth, snake, edge_priority, monotonicity, highest_tile = score(board)
     total = score_board(board)
-    print(f"total: {total}, zeros: {zeros}, smooth: {smooth}, snake: {snake}, edges: {edge_priority}, mono: {monotonicity}, highest_tile: {highest_tile}")
+    print(f"total: {total}, \nzeros: {zeros}, \nsmooth: {smooth}, \nsnake: {snake}, \nedges: {edge_priority}, \nmono: {monotonicity}, \nhighest_tile: {highest_tile}")
