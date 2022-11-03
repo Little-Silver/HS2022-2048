@@ -124,7 +124,7 @@ def highest_tile(board):
 # Values going from one corner to an oposing corner should all be either increasing or decreasing
 @njit
 def monotonicity(board):
-    mono = -12
+    mono = 0
 
     for r in board:
         if r[0] < r[1]:

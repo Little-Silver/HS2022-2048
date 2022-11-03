@@ -12,7 +12,7 @@ BOARD_HEIGHT = 4
 
 UP, DOWN, LEFT, RIGHT = 0, 1, 2, 3
 
-MIN_PROB = 0.001
+MIN_PROB = 0.003
 
 
 # ********************************* MAIN *********************************
@@ -37,9 +37,9 @@ def score_toplevel_move(move, board):
     zeros = ha.count_zeros(board)
 
     depth = 2
-    if (zeros < 5):
+    if (zeros < 4):
         depth = 3
-    if (zeros < 3):
+    if (zeros < 2):
         depth = 4
 
     return step(board, move, depth, 1)
@@ -47,15 +47,29 @@ def score_toplevel_move(move, board):
 
 # ********************************* EXPECTIMAX *********************************
 def score_spawn_possibilities(board, depth, prob):
+    
+
     zeros = ha.count_zeros(board)
-    prob_2 = 0.9 / zeros
-    prob_4 = 0.1 / zeros
-   
-    score = 10 + np.sum(np.array([
-        simulate_move(x, y, 2, board, depth, prob * prob_2) + 
-        simulate_move(x, y, 4, board, depth, prob * prob_4)
-        for (x,y), val in np.ndenumerate(board) if val == 0
-        ]))
+    if zeros > 3:
+
+        prob_2 = 0.9 / zeros
+        prob_4 = 0.1 / zeros
+    
+        score = 10 + np.sum(np.array([
+            simulate_move(x, y, 2, board, depth, prob * prob_2) + 
+            simulate_move(x, y, 4, board, depth, prob * prob_4)
+            for (x,y), val in np.ndenumerate(board) if val == 0
+            ]))
+
+    else:
+        
+        prob_2 = 1 / zeros
+    
+        score = 10 + np.sum(np.array([
+            simulate_move(x, y, 2, board, depth, prob * prob)
+            for (x,y), val in np.ndenumerate(board) if val == 0
+            ]))
+
 
     return score
 
@@ -114,7 +128,7 @@ def add_score(board, score):
 def score(board):
 
     zeros = FACTOR_EMPTY_TILES*ha.zero_score(board)
-    smooth = FACTOR_SMOOTHNESS*ha.smoothness(board)
+    smooth = FACTOR_SMOOTHNESS*ha.smoothness(board) 
     snake = 0#FACTOR_SNAKE*ha.snake_score(board)
     edge_priority = 0#FACTOR_EDGES*ha.prioritize_edges(board)
     monotonicity = FACTOR_MONO*ha.monotonicity(board)

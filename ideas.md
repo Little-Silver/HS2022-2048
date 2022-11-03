@@ -122,3 +122,8 @@ Hash table
 Zero score
 
 - Use zero score as optimal score.
+
+Only calculate 2-tiles
+
+- Always only calculate 2-tiles
+- Only calculate 4-tiles when there are less than X empty tiles
